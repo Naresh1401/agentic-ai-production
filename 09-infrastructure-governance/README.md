@@ -13,10 +13,13 @@ company-ready platform.
 ## What's here
 ```
 iac/terraform/          # real Terraform for a governed Cloud Run service
-  main.tf               # provider, least-privilege SA, Cloud Run + labels
+  main.tf               # provider, remote state, least-privilege SA, Cloud Run + labels
   variables.tf          # typed inputs with validation (env, required labels)
+  budget.tf             # optional billing budget with alert thresholds
   outputs.tf            # service URL + runtime SA
   terraform.tfvars.example
+  environments/         # per-environment values: dev.tfvars, stage.tfvars, prod.tfvars
+  backends/             # per-environment remote state config (dev.gcs.hcl ...)
 policy/
   require_labels.rego   # policy-as-code: deny resources missing governance tags
   require_labels_test.rego  # OPA unit tests for the policy (run in CI)
@@ -24,7 +27,9 @@ policy/
 
 > **Enforced in CI:** the `governance` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 > runs `tofu fmt`/`validate` and `opa check`/`opa test` on every push and PR, and
-> blocks the deploy pipeline if either fails.
+> blocks the deploy pipeline if either fails. A scheduled
+> [drift.yml](../.github/workflows/drift.yml) workflow runs `plan` weekly to catch
+> out-of-band changes.
 
 ## The end-to-end governance flow
 ```mermaid
@@ -39,21 +44,27 @@ flowchart LR
     AP --> M[Cost + audit<br/>budgets, logs]
 ```
 
-## Try it (needs Terraform + Conftest installed)
+## Try it (needs Terraform/OpenTofu + Conftest installed)
 ```bash
 cd 09-infrastructure-governance/iac/terraform
-terraform init
-terraform fmt -check          # style gate
-terraform validate            # schema gate
-cp terraform.tfvars.example terraform.tfvars   # edit values
-terraform plan -out plan.tfplan
 
-# Policy-as-code gate (Open Policy Agent via Conftest)
-terraform show -json plan.tfplan > plan.json
+# validate (no cloud needed)
+tofu init -backend=false
+tofu fmt -check
+tofu validate
+
+# per-environment plan/apply (needs GCP creds + a state bucket)
+tofu init -backend-config=backends/dev.gcs.hcl
+tofu plan  -var-file=environments/dev.tfvars -out plan.tfplan
+tofu apply plan.tfplan
+
+# policy-as-code gate (Open Policy Agent via Conftest)
+tofu show -json plan.tfplan > plan.json
 conftest test plan.json --policy ../../policy
 ```
-> No cloud account needed to read the code and understand the patterns. `plan`
-> requires GCP credentials; `validate`/`fmt` do not.
+> Promote the SAME code across environments by swapping `-var-file` and the
+> backend config — identical infra, different values. `validate`/`fmt` need no
+> cloud account.
 
 ## The pillars of cloud governance
 1. **Infrastructure as Code (IaC)** — Terraform / Bicep / Pulumi. Declarative,
@@ -91,11 +102,11 @@ conftest test plan.json --policy ../../policy
 5. Add a budget resource + alert to the Terraform.
 
 ## Definition of done
-- [ ] Infra defined as code (Terraform) for at least one environment
-- [ ] Standard labels/tags enforced (variable validation + policy)
-- [ ] A policy-as-code check blocks non-compliant resources
-- [ ] Least-privilege runtime service account, no static keys
-- [ ] Budget/quota + drift detection documented
+- [x] Infra defined as code (Terraform) for at least one environment
+- [x] Standard labels/tags enforced (variable validation + policy)
+- [x] A policy-as-code check blocks non-compliant resources
+- [x] Least-privilege runtime service account, no static keys
+- [x] Budget/quota + drift detection documented
 
 ## 📚 References
 - Terraform docs: https://developer.hashicorp.com/terraform/docs

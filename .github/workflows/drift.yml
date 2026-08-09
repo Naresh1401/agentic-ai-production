@@ -1,0 +1,46 @@
+name: Drift detection
+
+# Scheduled read-only `tofu plan` to catch out-of-band (click-ops) changes.
+# A non-empty plan means infra drifted from code — investigate and reconcile.
+# Requires the same GCP secrets/vars as the deploy pipeline.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [dev, stage, prod]
+        default: prod
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'prod' }}
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: 09-infrastructure-governance/iac/terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+
+      - name: Init with remote state
+        run: tofu init -backend-config="backends/${{ inputs.environment || 'prod' }}.gcs.hcl"
+
+      - name: Plan (detect drift)
+        run: |
+          tofu plan -detailed-exitcode \
+            -var-file="environments/${{ inputs.environment || 'prod' }}.tfvars" \
+            && echo "No drift detected." \
+            || (echo "::warning::Infrastructure drift detected — reconcile with code." && exit 1)

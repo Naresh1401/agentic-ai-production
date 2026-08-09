@@ -63,3 +63,22 @@ variable "labels" {
     error_message = "labels must include team, cost_center, and owner."
   }
 }
+
+variable "enable_budget" {
+  type        = bool
+  description = "Create a billing budget with alert thresholds."
+  default     = false
+}
+
+variable "billing_account" {
+  type        = string
+  description = "Billing account id (required when enable_budget = true)."
+  default     = ""
+}
+
+variable "monthly_budget_usd" {
+  type        = number
+  description = "Monthly budget amount in USD."
+  default     = 100
+}
+

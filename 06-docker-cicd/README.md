@@ -31,6 +31,59 @@ curl localhost:8000/health
 4. **Build** — docker build (and push to a registry)
 5. **Deploy** — to the cloud runtime (Module 5) on `main`
 
+## Complete pipeline overview
+
+The repo has **four** workflows in [`.github/workflows/`](../.github/workflows/):
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| [ci.yml](../.github/workflows/ci.yml) | push, PR | test → governance → build → push-image → deploy dev→stage→prod |
+| [deploy-cloudrun.yml](../.github/workflows/deploy-cloudrun.yml) | called by ci.yml | reusable Cloud Run deploy for one environment |
+| [deploy-azure.yml](../.github/workflows/deploy-azure.yml) | manual | alternative Azure Container Apps deploy |
+| [drift.yml](../.github/workflows/drift.yml) | weekly cron, manual | detect infra drift with `tofu plan` |
+
+### `ci.yml` job graph
+```mermaid
+flowchart TD
+    T[test<br/>lint + pytest + eval gate] --> B[build<br/>docker build check]
+    G[governance<br/>tofu validate + opa test] --> PI
+    B --> PI[push-image<br/>build once, push to Artifact Registry]
+    PI --> DV[deploy-dev<br/>env: dev]
+    DV --> DS[deploy-stage<br/>env: stage]
+    DS --> DP[deploy-prod<br/>env: prod, manual approval]
+```
+
+### What runs when
+| Event | Jobs that run |
+|-------|---------------|
+| Pull request | `test`, `governance`, `build` (deploy jobs skipped) |
+| Push to `main` | all of the above **+** `push-image` → `deploy-dev` → `deploy-stage` → `deploy-prod` |
+| Weekly / manual | `drift` (read-only `tofu plan`) |
+
+### Key design decisions
+- **Quality gates first**: `test` (lint + unit tests + eval gate) and `governance`
+  (IaC validate + policy tests) must pass before anything is built or shipped.
+- **Build once, promote many**: `push-image` creates a single image tagged with
+  the commit SHA; each environment deploys that exact tag — no per-env rebuilds,
+  no "works in stage, breaks in prod".
+- **Environment gates**: `deploy-*` jobs use GitHub Environments, so prod can
+  require a manual reviewer and per-env secrets/vars apply automatically.
+- **Keyless auth**: GCP via Workload Identity Federation, Azure via OIDC — no
+  long-lived credentials stored in the repo.
+- **Traceable + reversible**: SHA-tagged images mean any deploy = a known commit,
+  and rollback = redeploy the previous tag.
+
+### Required configuration
+- Repo secrets/variables and per-environment (dev/stage/prod) variables — see the
+  tables in the [auto-deploy section](#auto-deploy-with-dev--stage--prod-promotion-githubworkflowsciyml) below.
+
+### Rollback
+```bash
+# redeploy a previous known-good image tag
+gcloud run deploy agentic-ai --image <registry>/agentic-ai:<previous-sha> \
+  --project <proj> --region <region>
+```
+
 ## Good CI hygiene
 - Cache pip/deps for speed.
 - Run on every PR; require green to merge.

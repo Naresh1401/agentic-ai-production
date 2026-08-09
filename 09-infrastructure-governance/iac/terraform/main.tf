@@ -7,11 +7,9 @@ terraform {
     }
   }
 
-  # Governance: use a remote, locked backend in real projects (not local state).
-  # backend "gcs" {
-  #   bucket = "my-tf-state-bucket"
-  #   prefix = "agentic-ai"
-  # }
+  # Governance: remote, locked state. Config supplied per environment via
+  # `tofu init -backend-config=backends/<env>.gcs.hcl` (see backends/).
+  backend "gcs" {}
 }
 
 provider "google" {

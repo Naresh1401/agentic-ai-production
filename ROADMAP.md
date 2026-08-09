@@ -65,11 +65,11 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 > Foundational — you can read `08-agent-architecture/` right after Phase 1.
 
 ## Phase 8 — Govern the platform (Infrastructure & Cloud Governance)
-- [ ] Define infrastructure as code (Terraform) per environment
+- [x] Define infrastructure as code (Terraform) per environment
 - [x] Enforce standard labels/tags (variable validation + policy)
 - [x] Add policy-as-code checks (OPA/Conftest) in CI
-- [ ] Least-privilege identity, keyless auth, remote locked state
-- [ ] Budgets/quotas + scheduled drift detection
+- [x] Least-privilege identity, keyless auth, remote locked state
+- [x] Budgets/quotas + scheduled drift detection
 - [x] **DoD:** a non-compliant change is blocked automatically
 
 ## ★ Capstone
