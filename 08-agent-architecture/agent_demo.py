@@ -7,6 +7,27 @@ chooses the next action, and swap the toy retriever for a real vector store.
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
+
+try:  # optional: emit OpenTelemetry spans when the SDK is available
+    from opentelemetry import trace as _otel
+
+    _tracer = _otel.get_tracer("agent-demo")
+except Exception:  # pragma: no cover - otel not installed
+    _tracer = None
+
+
+@contextmanager
+def _span(name: str, **attributes):
+    """Emit a span per agent step (no-op unless OpenTelemetry is configured)."""
+    if _tracer is None:
+        yield
+        return
+    with _tracer.start_as_current_span(name) as span:
+        for key, value in attributes.items():
+            span.set_attribute(key, value)
+        yield
+
 
 # --- Tools ---------------------------------------------------------------
 
@@ -56,18 +77,22 @@ def plan(question: str) -> tuple[str, str]:
 
 def run_agent(question: str, max_steps: int = 3) -> str:
     trace: list[str] = []
-    for _ in range(max_steps):
-        action, arg = plan(question)
-        trace.append(f"plan -> {action}({arg!r})")
-        if action == "calculator":
-            result = calculator(arg)
-            trace.append(f"tool calculator -> {result}")
-            return _finalize(result, trace)
-        if action == "retrieve":
-            result = retrieve(arg)
-            trace.append(f"retrieved -> {result}")
-            return _finalize(result, trace)
-        return _finalize(f"(direct answer to) {arg}", trace)
+    with _span("agent.run", question=question):
+        for _ in range(max_steps):
+            with _span("plan"):
+                action, arg = plan(question)
+            trace.append(f"plan -> {action}({arg!r})")
+            if action == "calculator":
+                with _span("tool.calculator", expression=arg):
+                    result = calculator(arg)
+                trace.append(f"tool calculator -> {result}")
+                return _finalize(result, trace)
+            if action == "retrieve":
+                with _span("tool.retrieve", query=arg):
+                    result = retrieve(arg)
+                trace.append(f"retrieved -> {result}")
+                return _finalize(result, trace)
+            return _finalize(f"(direct answer to) {arg}", trace)
     return _finalize("gave up (step budget exhausted)", trace)
 
 

@@ -55,12 +55,12 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 - [x] **DoD:** measurable cost/latency drop with equal eval score (`07-cost-latency-optimization/compare.py`)
 
 ## Phase 7 — Level up the agent core (Architecture & Orchestration)
-- [ ] Build a bounded plan → act → observe loop
-- [ ] Add tool use / function calling with validated arguments
-- [ ] Add retrieval (RAG) to ground answers in fetched context
+- [x] Build a bounded plan → act → observe loop
+- [x] Add tool use / function calling with validated arguments
+- [x] Add retrieval (RAG) to ground answers in fetched context
 - [ ] Add short- and long-term memory
-- [ ] Choose the simplest orchestration pattern that passes evals
-- [ ] **DoD:** the agent uses a tool and grounded retrieval, fully traced
+- [x] Choose the simplest orchestration pattern that passes evals
+- [x] **DoD:** the agent uses a tool and grounded retrieval, fully traced
 
 > Foundational — you can read `08-agent-architecture/` right after Phase 1.
 

@@ -50,7 +50,7 @@ planner is deterministic here; in production you swap it for an LLM call.
 ## Definition of done
 - [x] A bounded plan → act → observe loop that calls at least one tool
 - [x] Retrieval grounds answers in fetched context
-- [ ] Every step is traced (ties into Module 4)
+- [x] Every step is traced (ties into Module 4) — OpenTelemetry spans per step
 - [x] The loop is evaluated (ties into Module 2) — see `test_agent.py`
 
 ## 📚 References

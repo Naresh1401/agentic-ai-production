@@ -26,8 +26,8 @@ Every optimization must be re-run through Module 2 evals. A cheaper/faster
 config that drops pass rate isn't a win.
 
 ## Quick wins checklist
-- [ ] Set `max_tokens`
-- [ ] Trim system prompt & few-shot
-- [ ] Stream responses
-- [ ] Add exact-match response cache
-- [ ] Try the next-smaller model behind an eval gate
+- [x] Set `max_tokens`
+- [x] Trim system prompt & few-shot
+- [x] Stream responses
+- [x] Add exact-match response cache
+- [x] Try the next-smaller model behind an eval gate
