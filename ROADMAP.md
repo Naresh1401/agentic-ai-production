@@ -73,8 +73,8 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 - [x] **DoD:** a non-compliant change is blocked automatically
 
 ## ★ Capstone
-- [ ] Combine every module into one deployed, observable, safe, evaluated agent
-- [ ] Write a short architecture doc + demo
+- [x] Combine every module into one deployed, observable, safe, evaluated agent (reference: `projects/support-agent/`)
+- [x] Write a short architecture doc + demo (`projects/support-agent/ARCHITECTURE.md`)
 
 ---
 

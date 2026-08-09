@@ -25,10 +25,12 @@ jobs:
         run: ruff check .
 
       - name: Unit tests
-        run: pytest 01-fastapi-deployment/ 02-evaluation-evals/ 03-agent-safety-guardrails/ 07-cost-latency-optimization/ 08-agent-architecture/ -q
+        run: pytest 01-fastapi-deployment/ 02-evaluation-evals/ 03-agent-safety-guardrails/ 07-cost-latency-optimization/ 08-agent-architecture/ projects/support-agent/ -q
 
       - name: Eval gate
-        run: python 02-evaluation-evals/evals/run_eval.py
+        run: |
+          python 02-evaluation-evals/evals/run_eval.py
+          python projects/support-agent/evals/run_eval.py
 
   governance:
     runs-on: ubuntu-latest

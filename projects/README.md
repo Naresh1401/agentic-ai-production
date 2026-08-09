@@ -1,5 +1,9 @@
 # ★ Capstone — Ship a Real Agentic System
 
+> **Reference implementation provided:** [support-agent/](support-agent/README.md)
+> is a complete, runnable example that combines all 9 modules (lint clean, 7
+> tests, eval 10/10). Study it, then build your own.
+
 Combine every module into one deployed, observable, safe, evaluated, optimized
 agent. This is your portfolio piece.
 
