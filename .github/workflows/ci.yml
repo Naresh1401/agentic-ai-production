@@ -32,13 +32,64 @@ jobs:
 
   build:
     needs: test
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
+      - name: Build Docker image (validation)
         run: docker build -t agentic-ai:${{ github.sha }} -f 06-docker-cicd/Dockerfile .
 
-      # - name: Deploy (add your cloud step here — see 05-cloud-aws-gcp-azure)
-      #   run: echo "deploy step goes here"
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # required for keyless GCP auth (Workload Identity Federation)
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      REPO: ${{ vars.AR_REPO }}
+      SERVICE: ${{ vars.GCP_SERVICE_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push image
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}/${SERVICE}:${{ github.sha }}"
+          docker build -t "$IMAGE" -f 06-docker-cicd/Dockerfile .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${SERVICE}" \
+            --image "${IMAGE}" \
+            --project "${PROJECT}" \
+            --region "${REGION}" \
+            --platform managed \
+            --set-env-vars APP_ENV=prod \
+            --set-secrets OPENAI_API_KEY=openai-key:latest \
+            --min-instances 1 --max-instances 20 \
+            --allow-unauthenticated
+
+      - name: Smoke test the deployment
+        run: |
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project "${PROJECT}" --region "${REGION}" \
+            --format 'value(status.url)')
+          echo "Deployed to $URL"
+          curl -fsS "$URL/health"

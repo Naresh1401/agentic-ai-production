@@ -45,7 +45,7 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
       (Cloud Run, Secret Manager, IAM) — see `05-cloud-aws-gcp-azure/azure` and `/gcp`
 - [x] Secrets management + config per environment
 - [ ] Promote one image dev → stage → prod
-- [ ] **DoD:** push to `main` → tests run → deploys automatically
+- [x] **DoD:** push to `main` → tests run → deploys automatically (pipeline in `.github/workflows/ci.yml`; needs GCP secrets configured)
 
 ## Phase 6 — Optimize it (Cost & Latency)
 - [x] Measure baseline p50/p95 latency and $/request

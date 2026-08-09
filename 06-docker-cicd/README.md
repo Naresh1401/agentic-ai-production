@@ -37,6 +37,38 @@ curl localhost:8000/health
 - Keep secrets in GitHub Actions **secrets**, never in the repo.
 - Tag images with the git SHA for traceable deploys + easy rollback.
 
+## Auto-deploy to Cloud Run (configured in `.github/workflows/ci.yml`)
+
+The pipeline's `deploy` job runs only on `main` and deploys to **GCP Cloud Run**
+using **keyless auth** (Workload Identity Federation — no service-account JSON
+keys stored in GitHub).
+
+### One-time GCP setup
+```bash
+# 1. Artifact Registry repo + Secret Manager secret (see 05-cloud-aws-gcp-azure/gcp)
+# 2. A deploy service account with roles:
+#    roles/run.admin, roles/artifactregistry.writer,
+#    roles/iam.serviceAccountUser, roles/secretmanager.secretAccessor
+# 3. A Workload Identity Pool + provider bound to this GitHub repo
+#    (google-github-actions/auth docs walk through the exact commands).
+```
+
+### GitHub → Settings → Secrets and variables → Actions
+| Kind | Name | Example |
+|------|------|---------|
+| Secret | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/123/locations/global/workloadIdentityPools/gh/providers/gh` |
+| Secret | `GCP_SERVICE_ACCOUNT` | `deployer@agentic-prod.iam.gserviceaccount.com` |
+| Variable | `GCP_PROJECT_ID` | `agentic-prod` |
+| Variable | `GCP_REGION` | `us-central1` |
+| Variable | `AR_REPO` | `agentic` |
+| Variable | `GCP_SERVICE_NAME` | `agentic-ai` |
+
+With these set, `git push` to `main` runs lint + tests + eval gate, builds and
+pushes the image, deploys to Cloud Run, and smoke-tests `/health`.
+
+> Azure equivalent: swap the `deploy` job for `azure/login` +
+> `az containerapp update` (see [../05-cloud-aws-gcp-azure/azure/README.md](../05-cloud-aws-gcp-azure/azure/README.md)).
+
 ## Exercises
 1. Get the image under 300 MB.
 2. Add the eval gate step and make it fail a PR intentionally.
@@ -44,7 +76,7 @@ curl localhost:8000/health
 4. Add a rollback step/notes.
 
 ## Definition of done
-- [ ] `docker run` serves the app locally
-- [ ] CI runs lint + tests on every push
-- [ ] Eval gate blocks regressions
-- [ ] `main` auto-builds (and ideally deploys)
+- [x] `docker run` serves the app locally
+- [x] CI runs lint + tests on every push
+- [x] Eval gate blocks regressions
+- [x] `main` auto-builds and deploys (once GCP secrets are configured)
