@@ -25,7 +25,13 @@ Follow the modules in order. See [ROADMAP.md](ROADMAP.md) for the full plan, che
 | 5 | [Cloud (AWS/GCP/Azure)](05-cloud-aws-gcp-azure/) | Deploy to a managed runtime |
 | 6 | [Docker & CI/CD](06-docker-cicd/) | Reproducible builds + auto tests/deploy |
 | 7 | [Cost & Latency Optimization](07-cost-latency-optimization/) | Faster, cheaper, same quality |
+| 8 | [Agent Architecture & Orchestration](08-agent-architecture/) | The agent core: loop, tools, RAG, memory |
+| 9 | [Infrastructure & Cloud Governance](09-infrastructure-governance/) | IaC + policy, identity, tagging, cost governance |
 | ★ | [Capstone Project](projects/) | Ship all of the above together |
+
+> New here? **Module 8** is the agent *core* (tools, RAG, memory). It's listed
+> last so the earlier modules give you a runnable service first — but feel free
+> to read it right after Module 1.
 
 ## ⚡ Quickstart (one command each)
 ```bash
@@ -74,7 +80,9 @@ Do the modules in order — each is ~30–60 min and ends with a working capabil
 5. **[Cloud (AWS/GCP/Azure)](05-cloud-aws-gcp-azure/)** — read the [environments](05-cloud-aws-gcp-azure/environments/) + [Azure](05-cloud-aws-gcp-azure/azure/README.md)/[GCP](05-cloud-aws-gcp-azure/gcp/README.md) guides.
 6. **[Docker & CI/CD](06-docker-cicd/)** — `make docker-build`, then review the CI pipeline.
 7. **[Cost & Latency](07-cost-latency-optimization/)** — `python 07-cost-latency-optimization/compare.py` for before/after.
-8. **[Capstone](projects/)** — combine everything into one deployed agent.
+8. **[Agent Architecture](08-agent-architecture/)** — `python 08-agent-architecture/agent_demo.py` to see the plan→act→answer loop.
+9. **[Infrastructure & Governance](09-infrastructure-governance/)** — read the Terraform + policy-as-code for governed, tagged, least-privilege infra.
+10. **[Capstone](projects/)** — combine everything into one deployed agent.
 
 Read each module's `README.md` (concepts + exercises) and `notes.md` (deep dive)
 as you go, and check off boxes in [ROADMAP.md](ROADMAP.md).

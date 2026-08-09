@@ -57,6 +57,14 @@ Output tokens usually cost 3–5× input — watch verbosity.
 3. Parallelize two tool calls; compare total latency.
 4. Cut the prompt by 30%; confirm eval score is unchanged.
 
+## 📚 References
+- OpenAI latency optimization guide: https://platform.openai.com/docs/guides/latency-optimization
+- OpenAI prompt caching: https://platform.openai.com/docs/guides/prompt-caching
+- Anthropic prompt caching: https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+- OpenAI pricing: https://openai.com/api/pricing/
+- Anthropic pricing: https://www.anthropic.com/pricing
+- vLLM (fast self-hosted inference): https://docs.vllm.ai/
+
 ## Definition of done
 - [x] Baseline p50/p95 latency + $/request recorded (`optimize.py`)
 - [x] One optimization applied with before/after numbers (`cache.py`, `router.py`)

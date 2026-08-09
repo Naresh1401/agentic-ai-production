@@ -68,6 +68,14 @@ az containerapp up \
 5. Stand up the **same app in dev, stage, and prod** using the configs in
    [environments/](environments/), promoting one image across all three.
 
+## 📚 References
+- GCP Cloud Run: https://cloud.google.com/run/docs
+- AWS ECS / Fargate: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
+- AWS App Runner: https://docs.aws.amazon.com/apprunner/
+- Azure Container Apps: https://learn.microsoft.com/en-us/azure/container-apps/
+- GCP Workload Identity Federation: https://cloud.google.com/iam/docs/workload-identity-federation
+- Well-Architected: [AWS](https://aws.amazon.com/architecture/well-architected/) · [Azure](https://learn.microsoft.com/en-us/azure/well-architected/) · [GCP](https://cloud.google.com/architecture/framework)
+
 ## Definition of done
 - [ ] Public HTTPS URL serving `/chat`
 - [ ] Secrets injected from a secret manager (not baked in)

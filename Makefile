@@ -38,6 +38,7 @@ demos: ## Run the standalone learning demos
 	$(BIN)/python 07-cost-latency-optimization/cache.py
 	$(BIN)/python 07-cost-latency-optimization/router.py
 	$(BIN)/python 07-cost-latency-optimization/compare.py
+	$(BIN)/python 08-agent-architecture/agent_demo.py
 
 check: lint test eval ## Lint + test + eval (what CI runs)
 

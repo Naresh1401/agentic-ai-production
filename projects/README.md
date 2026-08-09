@@ -11,6 +11,8 @@ agent. This is your portfolio piece.
 - [ ] **Module 5** — Deployed to a cloud runtime over HTTPS
 - [ ] **Module 6** — Dockerized + CI (lint/test/eval gate) + auto build
 - [ ] **Module 7** — Documented before/after cost & latency numbers
+- [ ] **Module 8** — Real agent loop: tool use + retrieval (RAG) + memory
+- [ ] **Module 9** — Infra as code (Terraform) + policy-as-code + tagging
 
 ## Suggested build
 Pick ONE narrow, useful use case (aligns with a customer-centric focus):

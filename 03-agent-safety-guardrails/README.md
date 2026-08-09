@@ -50,6 +50,15 @@ pytest 03-agent-safety-guardrails/                  # tests
 3. Add a "require confirmation" wrapper for destructive tools.
 4. Log every blocked request (tie into Module 4).
 
+## 📚 References
+- OWASP Top 10 for LLM Applications: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- Guardrails AI: https://www.guardrailsai.com/docs
+- NVIDIA NeMo Guardrails: https://github.com/NVIDIA/NeMo-Guardrails
+- Meta Llama Guard (model card): https://huggingface.co/meta-llama/Llama-Guard-3-8B
+- OpenAI moderation guide: https://platform.openai.com/docs/guides/moderation
+- Prompt injection series (Simon Willison): https://simonwillison.net/series/prompt-injection/
+- NIST AI Risk Management Framework: https://www.nist.gov/itl/ai-risk-management-framework
+
 ## Definition of done
 - [x] Known injection strings are blocked
 - [x] Output validated against a schema

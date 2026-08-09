@@ -50,6 +50,14 @@ Prints a nested trace with durations and token/cost attributes.
 3. Export to Langfuse or an OTLP collector.
 4. Add a dashboard panel for p95 latency and $/1k requests.
 
+## 📚 References
+- OpenTelemetry docs: https://opentelemetry.io/docs/
+- OpenTelemetry Python: https://opentelemetry.io/docs/languages/python/
+- Langfuse (LLM tracing): https://langfuse.com/docs
+- Arize Phoenix: https://docs.arize.com/phoenix
+- OpenLLMetry (OTel for LLMs): https://github.com/traceloop/openllmetry
+- Google SRE — golden signals: https://sre.google/sre-book/monitoring-distributed-systems/
+
 ## Definition of done
 - [x] Every request produces one trace with nested spans
 - [x] Tokens, cost, and latency are attributes on spans

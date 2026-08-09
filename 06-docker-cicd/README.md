@@ -100,6 +100,15 @@ OIDC login and needs `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
 3. Add a deploy job that runs only on `main`.
 4. Add a rollback step/notes.
 
+## 📚 References
+- Docker docs: https://docs.docker.com/
+- Dockerfile best practices: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+- Multi-stage builds: https://docs.docker.com/build/building/multi-stage/
+- GitHub Actions docs: https://docs.github.com/en/actions
+- google-github-actions/auth: https://github.com/google-github-actions/auth
+- Azure/login (OIDC): https://github.com/Azure/login
+- Trivy (image scanning): https://trivy.dev/
+
 ## Definition of done
 - [x] `docker run` serves the app locally
 - [x] CI runs lint + tests on every push

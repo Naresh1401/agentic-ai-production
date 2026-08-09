@@ -51,6 +51,15 @@ curl -N -X POST localhost:8000/chat/stream \
 3. Add API-key auth via a header dependency.
 4. Add a `/metrics` endpoint (see Module 4).
 
+## 📚 References
+- FastAPI docs: https://fastapi.tiangolo.com/
+- FastAPI deployment guide: https://fastapi.tiangolo.com/deployment/
+- Uvicorn (ASGI server): https://www.uvicorn.org/
+- Pydantic v2 docs: https://docs.pydantic.dev/latest/
+- Starlette (underlying toolkit): https://www.starlette.io/
+- MDN — Server-Sent Events: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+- The Twelve-Factor App: https://12factor.net/
+
 ## Definition of done
 - [x] `curl /health` → `{"status":"ok"}`
 - [x] `POST /chat` returns a model answer

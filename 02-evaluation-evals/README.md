@@ -49,6 +49,14 @@ Start deterministic, add judge for open-ended tasks, sample human review.
 3. Fail CI (Module 6) when pass rate drops below a threshold.
 4. Add per-category breakdown to the report.
 
+## 📚 References
+- OpenAI Evals: https://github.com/openai/evals
+- OpenAI evals guide: https://platform.openai.com/docs/guides/evals
+- promptfoo: https://www.promptfoo.dev/docs/intro/
+- Ragas (RAG metrics): https://docs.ragas.io/
+- DeepEval: https://deepeval.com/
+- Anthropic cookbook (evals recipes): https://github.com/anthropics/anthropic-cookbook
+
 ## Definition of done
 - [x] One command runs the eval and prints a pass rate
 - [x] Dataset has ≥10 labeled cases
