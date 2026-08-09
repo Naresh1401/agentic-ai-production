@@ -35,3 +35,12 @@ htmlcov/
 *.db
 traces/
 data/local/
+
+# Terraform / OpenTofu
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+plan.json
+crash.log
