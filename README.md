@@ -27,36 +27,61 @@ Follow the modules in order. See [ROADMAP.md](ROADMAP.md) for the full plan, che
 | 7 | [Cost & Latency Optimization](07-cost-latency-optimization/) | Faster, cheaper, same quality |
 | ★ | [Capstone Project](projects/) | Ship all of the above together |
 
-## ⚡ Quickstart
+## ⚡ Quickstart (one command each)
 ```bash
-# 1. Create a virtual environment
-python3 -m venv .venv && source .venv/bin/activate
+# 1. Get the repo
+git clone https://github.com/Naresh1401/agentic-ai-production.git
+cd agentic-ai-production
 
-# 2. Install shared dependencies
-pip install -r requirements.txt
+# 2. Set up everything (venv + deps + .env)
+make setup
 
-# 3. Copy env template and add your keys
-cp .env.example .env
-
-# 4. Run the module 1 API
-uvicorn app.main:app --reload --app-dir 01-fastapi-deployment
-
-# 5. (Optional) Run the tests + eval gate
-pytest 01-fastapi-deployment/ 03-agent-safety-guardrails/
-python 02-evaluation-evals/evals/run_eval.py
+# 3. Run the API (works in mock mode without any API key)
+make run
 ```
 
-> The service runs without any API key in **mock mode**, so every command above
-> works out of the box.
+Prefer manual steps? Everything `make` does, by hand:
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload --app-dir 01-fastapi-deployment
+```
 
-## 🧭 How to use this repo
-1. Read the module `README.md` and `notes.md`.
-2. Run the code, break it, fix it.
-3. Complete the exercises at the bottom of each module.
-4. Track progress in [ROADMAP.md](ROADMAP.md) by checking off boxes.
+> Requires **Python 3.10+** (3.12 recommended). The service runs without any API
+> key in **mock mode**, so every command works out of the box. Add keys to `.env`
+> later to hit real models.
+
+### Handy commands
+| Command | What it does |
+|---------|--------------|
+| `make setup` | Create venv, install deps, create `.env` |
+| `make run` | Start the agent API with hot reload |
+| `make test` | Run the unit tests |
+| `make eval` | Run the eval quality gate |
+| `make demos` | Run all standalone learning demos |
+| `make check` | Lint + test + eval (same as CI) |
+| `make docker-build` | Build the production container |
+| `make help` | List every target |
+
+## 🧭 Guided walkthrough
+Do the modules in order — each is ~30–60 min and ends with a working capability.
+
+1. **[FastAPI / Deployment](01-fastapi-deployment/)** — `make run`, then `curl localhost:8000/health` and `POST /chat`.
+2. **[Evaluation & Evals](02-evaluation-evals/)** — `make eval` to score the agent.
+3. **[Agent Safety & Guardrails](03-agent-safety-guardrails/)** — `make test` (guardrail tests) + read the threat model.
+4. **[Observability & Tracing](04-observability-tracing/)** — `python 04-observability-tracing/tracing.py` to see a trace.
+5. **[Cloud (AWS/GCP/Azure)](05-cloud-aws-gcp-azure/)** — read the [environments](05-cloud-aws-gcp-azure/environments/) + [Azure](05-cloud-aws-gcp-azure/azure/README.md)/[GCP](05-cloud-aws-gcp-azure/gcp/README.md) guides.
+6. **[Docker & CI/CD](06-docker-cicd/)** — `make docker-build`, then review the CI pipeline.
+7. **[Cost & Latency](07-cost-latency-optimization/)** — `python 07-cost-latency-optimization/compare.py` for before/after.
+8. **[Capstone](projects/)** — combine everything into one deployed agent.
+
+Read each module's `README.md` (concepts + exercises) and `notes.md` (deep dive)
+as you go, and check off boxes in [ROADMAP.md](ROADMAP.md).
 
 ## 📌 Progress tracker
 Keep a short log in [PROGRESS.md](PROGRESS.md) — one line per session. Reviewing it weekly compounds fast.
 
 ---
 Built as an ongoing learning journey. Contributions to your future self welcome. 🙌
+
