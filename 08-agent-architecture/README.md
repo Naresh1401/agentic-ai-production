@@ -48,10 +48,10 @@ planner is deterministic here; in production you swap it for an LLM call.
 5. Wire this agent into the Module 1 `/chat` endpoint.
 
 ## Definition of done
-- [ ] A bounded plan → act → observe loop that calls at least one tool
-- [ ] Retrieval grounds answers in fetched context
+- [x] A bounded plan → act → observe loop that calls at least one tool
+- [x] Retrieval grounds answers in fetched context
 - [ ] Every step is traced (ties into Module 4)
-- [ ] The loop is evaluated (ties into Module 2)
+- [x] The loop is evaluated (ties into Module 2) — see `test_agent.py`
 
 ## 📚 References
 - Anthropic — Building effective agents: https://www.anthropic.com/research/building-effective-agents

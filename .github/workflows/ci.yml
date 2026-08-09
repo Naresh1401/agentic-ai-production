@@ -25,7 +25,7 @@ jobs:
         run: ruff check .
 
       - name: Unit tests
-        run: pytest 03-agent-safety-guardrails/ 01-fastapi-deployment/ -q
+        run: pytest 01-fastapi-deployment/ 02-evaluation-evals/ 03-agent-safety-guardrails/ 07-cost-latency-optimization/ 08-agent-architecture/ -q
 
       - name: Eval gate
         run: python 02-evaluation-evals/evals/run_eval.py

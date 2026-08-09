@@ -24,7 +24,7 @@ run: ## Run the API locally (works in mock mode without keys)
 	$(BIN)/uvicorn app.main:app --reload --app-dir 01-fastapi-deployment
 
 test: ## Run unit tests (service + guardrails)
-	$(BIN)/pytest 01-fastapi-deployment/ 03-agent-safety-guardrails/
+	$(BIN)/pytest 01-fastapi-deployment/ 02-evaluation-evals/ 03-agent-safety-guardrails/ 07-cost-latency-optimization/ 08-agent-architecture/
 
 eval: ## Run the eval quality gate
 	$(BIN)/python 02-evaluation-evals/evals/run_eval.py
