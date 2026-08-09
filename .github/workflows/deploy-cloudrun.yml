@@ -1,0 +1,65 @@
+name: Deploy to Cloud Run (reusable)
+
+# Reusable workflow: deploys a prebuilt image to Cloud Run for one environment.
+# Called by ci.yml for dev -> stage -> prod. Per-environment values come from
+# GitHub Environment variables/secrets (Settings -> Environments).
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      app_env:
+        required: true
+        type: string
+      min_instances:
+        required: true
+        type: string
+      max_instances:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write   # keyless GCP auth (Workload Identity Federation)
+    env:
+      PROJECT: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      SERVICE: ${{ vars.GCP_SERVICE_NAME }}
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${SERVICE}" \
+            --image "${{ inputs.image }}" \
+            --project "${PROJECT}" \
+            --region "${REGION}" \
+            --platform managed \
+            --set-env-vars APP_ENV=${{ inputs.app_env }} \
+            --set-secrets OPENAI_API_KEY=openai-key:latest \
+            --min-instances ${{ inputs.min_instances }} \
+            --max-instances ${{ inputs.max_instances }} \
+            --allow-unauthenticated
+
+      - name: Smoke test the deployment
+        run: |
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project "${PROJECT}" --region "${REGION}" \
+            --format 'value(status.url)')
+          echo "Deployed ${{ inputs.environment }} to $URL"
+          curl -fsS "$URL/health"

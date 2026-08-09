@@ -37,11 +37,20 @@ curl localhost:8000/health
 - Keep secrets in GitHub Actions **secrets**, never in the repo.
 - Tag images with the git SHA for traceable deploys + easy rollback.
 
-## Auto-deploy to Cloud Run (configured in `.github/workflows/ci.yml`)
+## Auto-deploy with dev → stage → prod promotion (`.github/workflows/ci.yml`)
 
-The pipeline's `deploy` job runs only on `main` and deploys to **GCP Cloud Run**
-using **keyless auth** (Workload Identity Federation — no service-account JSON
-keys stored in GitHub).
+On `main`, the pipeline builds the image **once**, pushes it to Artifact
+Registry, then promotes that same tag through **dev → stage → prod**. Each stage
+is a GitHub **Environment**, so you can require manual approval before prod.
+Auth is **keyless** (Workload Identity Federation — no JSON keys in GitHub).
+
+```
+test → build → push-image → deploy-dev → deploy-stage → deploy-prod
+```
+
+The deploy step lives in a reusable workflow
+([deploy-cloudrun.yml](../.github/workflows/deploy-cloudrun.yml)) called once per
+environment with env-specific `APP_ENV` and scaling.
 
 ### One-time GCP setup
 ```bash
@@ -53,21 +62,37 @@ keys stored in GitHub).
 #    (google-github-actions/auth docs walk through the exact commands).
 ```
 
-### GitHub → Settings → Secrets and variables → Actions
+### Repository-level (Settings → Secrets and variables → Actions)
+Used once to build + push the shared image.
+
 | Kind | Name | Example |
 |------|------|---------|
 | Secret | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/123/locations/global/workloadIdentityPools/gh/providers/gh` |
-| Secret | `GCP_SERVICE_ACCOUNT` | `deployer@agentic-prod.iam.gserviceaccount.com` |
+| Secret | `GCP_SERVICE_ACCOUNT` | `deployer@agentic.iam.gserviceaccount.com` |
+| Variable | `AR_PROJECT_ID` | `agentic-shared` |
+| Variable | `AR_REGION` | `us-central1` |
+| Variable | `AR_REPO` | `agentic` |
+| Variable | `IMAGE_NAME` | `agentic-ai` |
+
+### Per-environment (Settings → Environments → dev / stage / prod)
+Each Environment sets the deploy target. Same names, different values.
+
+| Kind | Name | Example (prod) |
+|------|------|----------------|
 | Variable | `GCP_PROJECT_ID` | `agentic-prod` |
 | Variable | `GCP_REGION` | `us-central1` |
-| Variable | `AR_REPO` | `agentic` |
 | Variable | `GCP_SERVICE_NAME` | `agentic-ai` |
 
-With these set, `git push` to `main` runs lint + tests + eval gate, builds and
-pushes the image, deploys to Cloud Run, and smoke-tests `/health`.
+> Add **Required reviewers** on the `prod` Environment to gate production
+> deploys behind a manual approval.
 
-> Azure equivalent: swap the `deploy` job for `azure/login` +
-> `az containerapp update` (see [../05-cloud-aws-gcp-azure/azure/README.md](../05-cloud-aws-gcp-azure/azure/README.md)).
+### Azure alternative
+[deploy-azure.yml](../.github/workflows/deploy-azure.yml) is a manually-triggered
+(`workflow_dispatch`) Container Apps deploy with a dev/stage/prod choice. It uses
+OIDC login and needs `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
+`AZURE_SUBSCRIPTION_ID` (secrets) plus `AZ_RESOURCE_GROUP`, `AZ_CONTAINERAPP`,
+`AZ_ACR` (per-environment variables). See
+[../05-cloud-aws-gcp-azure/azure/README.md](../05-cloud-aws-gcp-azure/azure/README.md).
 
 ## Exercises
 1. Get the image under 300 MB.

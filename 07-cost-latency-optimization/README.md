@@ -11,6 +11,7 @@ optimize blind; always guard quality with Module 2 evals.
 optimize.py   # benchmark harness: latency percentiles + cost estimate
 cache.py      # exact-match + naive semantic response cache
 router.py     # small-model-first routing with escalation metric
+compare.py    # before/after: cost & latency drop at equal eval score
 ```
 
 ## Run it
@@ -18,6 +19,7 @@ router.py     # small-model-first routing with escalation metric
 python 07-cost-latency-optimization/optimize.py
 python 07-cost-latency-optimization/cache.py
 python 07-cost-latency-optimization/router.py
+python 07-cost-latency-optimization/compare.py
 ```
 
 ## Levers (roughly high→low impact)
@@ -58,7 +60,7 @@ Output tokens usually cost 3–5× input — watch verbosity.
 ## Definition of done
 - [x] Baseline p50/p95 latency + $/request recorded (`optimize.py`)
 - [x] One optimization applied with before/after numbers (`cache.py`, `router.py`)
-- [ ] Eval score unchanged (quality preserved)
+- [x] Eval score unchanged (quality preserved) — see `compare.py`
 
-> `cache.py` shows exact + semantic response caching; `router.py` shows
-> small-model-first routing with an escalation-rate metric.
+> `compare.py` shows the routed config cutting cost and latency while re-running
+> the module 02 eval to confirm the pass rate is unchanged.

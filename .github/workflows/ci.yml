@@ -39,23 +39,26 @@ jobs:
       - name: Build Docker image (validation)
         run: docker build -t agentic-ai:${{ github.sha }} -f 06-docker-cicd/Dockerfile .
 
-  deploy:
+  # Build the image ONCE, push to Artifact Registry, then promote the same
+  # image tag through dev -> stage -> prod (GitHub Environments gate each step).
+  push-image:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # required for keyless GCP auth (Workload Identity Federation)
+      id-token: write   # keyless GCP auth (Workload Identity Federation)
+    outputs:
+      image: ${{ steps.build-push.outputs.image }}
     env:
-      PROJECT: ${{ vars.GCP_PROJECT_ID }}
-      REGION: ${{ vars.GCP_REGION }}
-      REPO: ${{ vars.AR_REPO }}
-      SERVICE: ${{ vars.GCP_SERVICE_NAME }}
+      AR_PROJECT: ${{ vars.AR_PROJECT_ID }}
+      AR_REGION: ${{ vars.AR_REGION }}
+      AR_REPO: ${{ vars.AR_REPO }}
+      IMAGE_NAME: ${{ vars.IMAGE_NAME }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -65,31 +68,46 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+        run: gcloud auth configure-docker "${AR_REGION}-docker.pkg.dev" --quiet
 
       - name: Build and push image
+        id: build-push
         run: |
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}/${SERVICE}:${{ github.sha }}"
+          IMAGE="${AR_REGION}-docker.pkg.dev/${AR_PROJECT}/${AR_REPO}/${IMAGE_NAME}:${{ github.sha }}"
           docker build -t "$IMAGE" -f 06-docker-cicd/Dockerfile .
           docker push "$IMAGE"
-          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy "${SERVICE}" \
-            --image "${IMAGE}" \
-            --project "${PROJECT}" \
-            --region "${REGION}" \
-            --platform managed \
-            --set-env-vars APP_ENV=prod \
-            --set-secrets OPENAI_API_KEY=openai-key:latest \
-            --min-instances 1 --max-instances 20 \
-            --allow-unauthenticated
+  deploy-dev:
+    needs: push-image
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy-cloudrun.yml
+    with:
+      environment: dev
+      image: ${{ needs.push-image.outputs.image }}
+      app_env: dev
+      min_instances: "0"
+      max_instances: "1"
+    secrets: inherit
 
-      - name: Smoke test the deployment
-        run: |
-          URL=$(gcloud run services describe "${SERVICE}" \
-            --project "${PROJECT}" --region "${REGION}" \
-            --format 'value(status.url)')
-          echo "Deployed to $URL"
-          curl -fsS "$URL/health"
+  deploy-stage:
+    needs: [push-image, deploy-dev]
+    uses: ./.github/workflows/deploy-cloudrun.yml
+    with:
+      environment: stage
+      image: ${{ needs.push-image.outputs.image }}
+      app_env: stage
+      min_instances: "1"
+      max_instances: "3"
+    secrets: inherit
+
+  deploy-prod:
+    needs: [push-image, deploy-stage]
+    uses: ./.github/workflows/deploy-cloudrun.yml
+    with:
+      environment: prod
+      image: ${{ needs.push-image.outputs.image }}
+      app_env: prod
+      min_instances: "2"
+      max_instances: "20"
+    secrets: inherit

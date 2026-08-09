@@ -24,9 +24,11 @@ from .schemas import (
 )
 from .security import require_api_key
 from .session_store import store
+from .tracing import setup_tracing, tracer
 
 app = FastAPI(title="Agentic AI Service", version="0.1.0")
 app.add_middleware(ObservabilityMiddleware)
+setup_tracing()
 
 
 @app.get("/health")
@@ -63,9 +65,12 @@ async def chat(req: ChatRequest) -> ChatResponse:
         message = req.message
 
     try:
-        reply, mock = await asyncio.wait_for(
-            agent.run(message), timeout=settings.request_timeout_seconds
-        )
+        with tracer.start_as_current_span("agent.run") as span:
+            span.set_attribute("model", settings.default_model)
+            reply, mock = await asyncio.wait_for(
+                agent.run(message), timeout=settings.request_timeout_seconds
+            )
+            span.set_attribute("mock", mock)
     except asyncio.TimeoutError as exc:
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,

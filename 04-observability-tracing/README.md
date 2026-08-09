@@ -57,3 +57,6 @@ Prints a nested trace with durations and token/cost attributes.
 
 > The service adds a request-ID + structured-log + latency middleware
 > (`01-fastapi-deployment/app/middleware.py`) and exposes `/metrics`.
+> It also ships OpenTelemetry wiring (`01-fastapi-deployment/app/tracing.py`):
+> set `OTEL_EXPORTER_OTLP_ENDPOINT` to stream traces to a live backend
+> (Langfuse / Phoenix / Tempo / any OTLP collector); without it, spans are no-ops.

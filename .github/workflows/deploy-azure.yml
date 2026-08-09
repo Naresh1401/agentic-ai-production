@@ -1,0 +1,56 @@
+name: Deploy to Azure Container Apps
+
+# Alternative cloud target. Manually triggered; pick the environment to deploy.
+# Uses keyless OIDC login (azure/login) — no stored publish profiles or passwords.
+# Configure per-environment variables/secrets under Settings -> Environments.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, stage, prod]
+        default: dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write   # keyless Azure OIDC login
+    env:
+      RG: ${{ vars.AZ_RESOURCE_GROUP }}
+      APP: ${{ vars.AZ_CONTAINERAPP }}
+      ACR: ${{ vars.AZ_ACR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build image in ACR (server-side, no local Docker)
+        run: |
+          az acr build \
+            --registry "${ACR}" \
+            --image agentic-ai:${{ github.sha }} \
+            --file 06-docker-cicd/Dockerfile .
+
+      - name: Deploy to Container Apps
+        run: |
+          az containerapp update \
+            --name "${APP}" \
+            --resource-group "${RG}" \
+            --image "${ACR}.azurecr.io/agentic-ai:${{ github.sha }}" \
+            --set-env-vars APP_ENV=${{ inputs.environment }}
+
+      - name: Smoke test the deployment
+        run: |
+          FQDN=$(az containerapp show --name "${APP}" --resource-group "${RG}" \
+            --query properties.configuration.ingress.fqdn -o tsv)
+          echo "Deployed ${{ inputs.environment }} to https://$FQDN"
+          curl -fsS "https://$FQDN/health"

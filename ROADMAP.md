@@ -33,18 +33,18 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 - [x] Structured logging (JSON logs with request IDs)
 - [x] Distributed tracing (OpenTelemetry spans per step)
 - [x] Token/cost/latency metrics per request
-- [ ] Wire to a backend (Langfuse / Phoenix / OTLP collector)
+- [x] Wire to a backend (Langfuse / Phoenix / OTLP collector) — set `OTEL_EXPORTER_OTLP_ENDPOINT`
 - [x] **DoD:** open one trace and see every LLM + tool call
 
 ## Phase 5 — Ship it (Cloud + Docker + CI/CD)
 - [x] Containerize with a slim, multi-stage Dockerfile
 - [x] CI: lint + test + build on every push
 - [x] Define **dev / stage / prod / on-prem** environments (config, not code)
-- [ ] Deploy to one cloud runtime (Cloud Run / ECS / Container Apps)
+- [ ] Deploy to one cloud runtime (Cloud Run / ECS / Container Apps) — needs a live cloud account
 - [x] Go deep on **Azure** (Container Apps, Key Vault, Entra ID) and **GCP**
       (Cloud Run, Secret Manager, IAM) — see `05-cloud-aws-gcp-azure/azure` and `/gcp`
 - [x] Secrets management + config per environment
-- [ ] Promote one image dev → stage → prod
+- [x] Promote one image dev → stage → prod (build-once pipeline in `.github/workflows/ci.yml`)
 - [x] **DoD:** push to `main` → tests run → deploys automatically (pipeline in `.github/workflows/ci.yml`; needs GCP secrets configured)
 
 ## Phase 6 — Optimize it (Cost & Latency)
@@ -52,7 +52,7 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 - [x] Prompt caching + response caching
 - [x] Model routing (small model first, escalate)
 - [x] Batching, concurrency, and streaming
-- [ ] **DoD:** measurable cost/latency drop with equal eval score
+- [x] **DoD:** measurable cost/latency drop with equal eval score (`07-cost-latency-optimization/compare.py`)
 
 ## ★ Capstone
 - [ ] Combine every module into one deployed, observable, safe, evaluated agent
