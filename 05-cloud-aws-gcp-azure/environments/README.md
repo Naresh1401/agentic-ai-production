@@ -98,8 +98,8 @@ See the deep-dive guides:
 - [../gcp/README.md](../gcp/README.md) — GCP from scratch
 
 ## Checklist
-- [ ] Four environments defined with separate secrets + data
-- [ ] One image promoted dev → stage → prod (no per-env rebuilds)
-- [ ] Stage mirrors prod infra
-- [ ] On-prem path documented (runtime, model, secrets, upgrades)
-- [ ] Prod protected: CI-only deploys, SLOs, budget alerts
+- [x] Four environments defined with separate secrets + data
+- [x] One image promoted dev → stage → prod (no per-env rebuilds)
+- [x] Stage mirrors prod infra
+- [x] On-prem path documented (runtime, model, secrets, upgrades)
+- [x] Prod protected: CI-only deploys, SLOs, budget alerts

@@ -5,6 +5,7 @@ service always runs during learning/dev.
 """
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 
 from .config import get_settings
@@ -13,6 +14,32 @@ SYSTEM_PROMPT = (
     "You are a concise, helpful production assistant. "
     "Prefer short, correct answers."
 )
+
+# Transient error class names worth retrying (matched by name so we don't hard
+# depend on the openai package being importable).
+_TRANSIENT = (
+    "RateLimitError",
+    "APITimeoutError",
+    "APIConnectionError",
+    "InternalServerError",
+)
+
+
+def _is_transient(exc: Exception) -> bool:
+    return type(exc).__name__ in _TRANSIENT
+
+
+async def _with_retries(coro_factory, max_retries: int):
+    """Call an async factory, retrying transient errors with backoff."""
+    attempt = 0
+    while True:
+        try:
+            return await coro_factory()
+        except Exception as exc:  # noqa: BLE001 - re-raised below if not transient
+            if not _is_transient(exc) or attempt >= max_retries:
+                raise
+            await asyncio.sleep(0.5 * (2**attempt))  # 0.5s, 1s, 2s ...
+            attempt += 1
 
 
 async def _openai_client():
@@ -34,12 +61,16 @@ async def run(message: str) -> tuple[str, bool]:
     if client is None:
         return f"[mock] You said: {message}", True
 
-    resp = await client.chat.completions.create(
-        model=settings.default_model,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": message},
-        ],
+    resp = await _with_retries(
+        lambda: client.chat.completions.create(
+            model=settings.default_model,
+            max_tokens=settings.max_tokens,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": message},
+            ],
+        ),
+        settings.max_retries,
     )
     return resp.choices[0].message.content or "", False
 
@@ -55,6 +86,7 @@ async def stream(message: str) -> AsyncIterator[str]:
 
     result = await client.chat.completions.create(
         model=settings.default_model,
+        max_tokens=settings.max_tokens,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": message},

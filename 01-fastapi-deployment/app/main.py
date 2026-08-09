@@ -6,8 +6,10 @@ metrics, and structured request logging.
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from . import agent
@@ -26,9 +28,28 @@ from .security import require_api_key
 from .session_store import store
 from .tracing import setup_tracing, tracer
 
-app = FastAPI(title="Agentic AI Service", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup
+    setup_tracing()
+    yield
+    # shutdown: flush any buffered traces so nothing is lost on drain
+    from opentelemetry import trace
+
+    provider = trace.get_tracer_provider()
+    if hasattr(provider, "shutdown"):
+        provider.shutdown()
+
+
+app = FastAPI(title="Agentic AI Service", version="0.1.0", lifespan=lifespan)
 app.add_middleware(ObservabilityMiddleware)
-setup_tracing()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_settings().cors_origins_list,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")

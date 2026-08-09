@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     app_env: str = "dev"
     log_level: str = "INFO"
     request_timeout_seconds: float = 30.0
+    max_tokens: int = 1024
+    max_retries: int = 2
 
     # Service auth (off by default for local dev)
     require_auth: bool = False
@@ -21,6 +23,14 @@ class Settings(BaseSettings):
 
     # Safety
     enable_guardrails: bool = True
+
+    # CORS: comma-separated origins. "*" is convenient for dev; restrict in prod.
+    cors_allow_origins: str = "*"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_allow_origins.split(",") if o.strip()]
+
 
 
 @lru_cache

@@ -39,8 +39,15 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # 4. Run the module 1 API
-uvicorn 01-fastapi-deployment.app.main:app --reload
+uvicorn app.main:app --reload --app-dir 01-fastapi-deployment
+
+# 5. (Optional) Run the tests + eval gate
+pytest 01-fastapi-deployment/ 03-agent-safety-guardrails/
+python 02-evaluation-evals/evals/run_eval.py
 ```
+
+> The service runs without any API key in **mock mode**, so every command above
+> works out of the box.
 
 ## 🧭 How to use this repo
 1. Read the module `README.md` and `notes.md`.

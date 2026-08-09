@@ -17,13 +17,13 @@ services still applies: validation, timeouts, retries, health checks, logging.
 - WebSockets when you need bidirectional/interactive control.
 
 ## Production checklist
-- [ ] `/health` (liveness) and `/ready` (readiness) endpoints
-- [ ] Request timeouts + upstream (model) timeouts
-- [ ] Retries with backoff on transient model errors (429/5xx)
-- [ ] Structured JSON logs with a request ID
-- [ ] Input size limits (see `max_length` on schema)
-- [ ] Graceful shutdown (drain in-flight requests)
-- [ ] CORS configured for your frontend only
+- [x] `/health` (liveness) and `/ready` (readiness) endpoints
+- [x] Request timeouts + upstream (model) timeouts
+- [x] Retries with backoff on transient model errors (429/5xx)
+- [x] Structured JSON logs with a request ID
+- [x] Input size limits (see `max_length` on schema)
+- [x] Graceful shutdown (drain in-flight requests)
+- [x] CORS configured for your frontend only
 
 ## Deploy targets (preview of Module 5)
 - Containerize (Module 6), then run on Cloud Run / ECS / Container Apps.

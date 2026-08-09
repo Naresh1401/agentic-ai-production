@@ -73,5 +73,5 @@ az containerapp up \
 - [ ] Secrets injected from a secret manager (not baked in)
 - [ ] Autoscaling configured
 - [ ] A cost budget + alert exists
-- [ ] dev / stage / prod defined with separate secrets + config
-- [ ] On-prem deployment path documented (see [environments/](environments/))
+- [x] dev / stage / prod defined with separate secrets + config
+- [x] On-prem deployment path documented (see [environments/](environments/))

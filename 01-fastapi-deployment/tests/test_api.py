@@ -1,4 +1,5 @@
 """API tests for the agent service (runs in mock mode, no API key needed)."""
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -46,3 +47,21 @@ def test_metrics_endpoint():
     r = client.get("/metrics")
     assert r.status_code == 200
     assert r.json()["requests_total"] >= 1
+
+
+def test_cors_header_present():
+    r = client.get("/health", headers={"Origin": "http://example.com"})
+    assert r.status_code == 200
+    assert "access-control-allow-origin" in {k.lower() for k in r.headers}
+
+
+def test_retry_helper_reraises_non_transient():
+    import asyncio
+
+    from app.agent import _with_retries
+
+    async def boom():
+        raise ValueError("permanent")
+
+    with pytest.raises(ValueError):
+        asyncio.run(_with_retries(boom, max_retries=3))
