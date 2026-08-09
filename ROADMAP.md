@@ -6,52 +6,52 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 - [ ] Python async basics (`async`/`await`, event loop)
 - [ ] HTTP fundamentals (methods, status codes, JSON)
 - [ ] What an "agent" is: LLM + tools + loop + memory
-- [ ] Set up `.venv`, install `requirements.txt`, add API keys to `.env`
+- [x] Set up `.venv`, install `requirements.txt`, add API keys to `.env`
 
 ## Phase 1 — Serve it (FastAPI / Deployment)
-- [ ] Build a `/chat` endpoint that calls an LLM
-- [ ] Add request/response Pydantic models
-- [ ] Stream tokens with Server-Sent Events
-- [ ] Health checks + graceful shutdown
-- [ ] **DoD:** `curl` your agent and get a streamed answer
+- [x] Build a `/chat` endpoint that calls an LLM
+- [x] Add request/response Pydantic models
+- [x] Stream tokens with Server-Sent Events
+- [x] Health checks + graceful shutdown
+- [x] **DoD:** `curl` your agent and get a streamed answer
 
 ## Phase 2 — Measure it (Evals)
-- [ ] Build a small labeled dataset (JSONL)
-- [ ] Write deterministic checks (exact/regex/JSON schema)
-- [ ] Add an LLM-as-judge scorer
-- [ ] Report pass rate + regressions between runs
-- [ ] **DoD:** one command prints a score you trust
+- [x] Build a small labeled dataset (JSONL)
+- [x] Write deterministic checks (exact/regex/JSON schema)
+- [x] Add an LLM-as-judge scorer
+- [x] Report pass rate + regressions between runs
+- [x] **DoD:** one command prints a score you trust
 
 ## Phase 3 — Make it safe (Guardrails)
-- [ ] Input validation (PII, prompt injection, jailbreak patterns)
-- [ ] Output validation (schema, toxicity, hallucination checks)
-- [ ] Tool-use limits (allowlist, rate limits, timeouts)
-- [ ] Fail-safe fallbacks
-- [ ] **DoD:** malicious inputs get blocked, logged, and handled
+- [x] Input validation (PII, prompt injection, jailbreak patterns)
+- [x] Output validation (schema, toxicity, hallucination checks)
+- [x] Tool-use limits (allowlist, rate limits, timeouts)
+- [x] Fail-safe fallbacks
+- [x] **DoD:** malicious inputs get blocked, logged, and handled
 
 ## Phase 4 — See it (Observability & Tracing)
-- [ ] Structured logging (JSON logs with request IDs)
-- [ ] Distributed tracing (OpenTelemetry spans per step)
-- [ ] Token/cost/latency metrics per request
+- [x] Structured logging (JSON logs with request IDs)
+- [x] Distributed tracing (OpenTelemetry spans per step)
+- [x] Token/cost/latency metrics per request
 - [ ] Wire to a backend (Langfuse / Phoenix / OTLP collector)
-- [ ] **DoD:** open one trace and see every LLM + tool call
+- [x] **DoD:** open one trace and see every LLM + tool call
 
 ## Phase 5 — Ship it (Cloud + Docker + CI/CD)
-- [ ] Containerize with a slim, multi-stage Dockerfile
-- [ ] CI: lint + test + build on every push
-- [ ] Define **dev / stage / prod / on-prem** environments (config, not code)
+- [x] Containerize with a slim, multi-stage Dockerfile
+- [x] CI: lint + test + build on every push
+- [x] Define **dev / stage / prod / on-prem** environments (config, not code)
 - [ ] Deploy to one cloud runtime (Cloud Run / ECS / Container Apps)
-- [ ] Go deep on **Azure** (Container Apps, Key Vault, Entra ID) and **GCP**
+- [x] Go deep on **Azure** (Container Apps, Key Vault, Entra ID) and **GCP**
       (Cloud Run, Secret Manager, IAM) — see `05-cloud-aws-gcp-azure/azure` and `/gcp`
-- [ ] Secrets management + config per environment
+- [x] Secrets management + config per environment
 - [ ] Promote one image dev → stage → prod
 - [ ] **DoD:** push to `main` → tests run → deploys automatically
 
 ## Phase 6 — Optimize it (Cost & Latency)
-- [ ] Measure baseline p50/p95 latency and $/request
-- [ ] Prompt caching + response caching
-- [ ] Model routing (small model first, escalate)
-- [ ] Batching, concurrency, and streaming
+- [x] Measure baseline p50/p95 latency and $/request
+- [x] Prompt caching + response caching
+- [x] Model routing (small model first, escalate)
+- [x] Batching, concurrency, and streaming
 - [ ] **DoD:** measurable cost/latency drop with equal eval score
 
 ## ★ Capstone

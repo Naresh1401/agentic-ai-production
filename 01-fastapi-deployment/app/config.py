@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     request_timeout_seconds: float = 30.0
 
+    # Service auth (off by default for local dev)
+    require_auth: bool = False
+    api_key: str | None = None
+
+    # Safety
+    enable_guardrails: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:

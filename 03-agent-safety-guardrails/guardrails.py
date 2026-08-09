@@ -11,7 +11,7 @@ from dataclasses import dataclass
 # --- Input guards ---------------------------------------------------------
 
 INJECTION_PATTERNS = [
-    r"ignore (all|previous|above) instructions",
+    r"ignore (all|previous|above).*instructions",
     r"disregard (the )?system prompt",
     r"reveal your (system )?prompt",
     r"you are now",

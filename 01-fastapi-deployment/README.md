@@ -52,9 +52,13 @@ curl -N -X POST localhost:8000/chat/stream \
 4. Add a `/metrics` endpoint (see Module 4).
 
 ## Definition of done
-- [ ] `curl /health` → `{"status":"ok"}`
-- [ ] `POST /chat` returns a model answer
-- [ ] `POST /chat/stream` streams tokens
-- [ ] App reads config from `.env`
+- [x] `curl /health` → `{"status":"ok"}`
+- [x] `POST /chat` returns a model answer
+- [x] `POST /chat/stream` streams tokens
+- [x] App reads config from `.env`
+
+> Exercises implemented: `/chat/history` (in-memory session store), request
+> timeouts → `504`, API-key auth (`REQUIRE_AUTH`/`API_KEY`), and `/metrics`.
+> Run the API tests: `pytest 01-fastapi-deployment/`
 
 See [notes.md](notes.md) for deeper reference.

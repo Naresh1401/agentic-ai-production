@@ -13,3 +13,20 @@ class ChatResponse(BaseModel):
     reply: str
     model: str
     mock: bool = False
+
+
+class Message(BaseModel):
+    role: str
+    content: str
+
+
+class HistoryResponse(BaseModel):
+    session_id: str
+    messages: list[Message]
+
+
+class MetricsResponse(BaseModel):
+    requests_total: int
+    errors_total: int
+    latency_p50_ms: float
+    latency_p95_ms: float

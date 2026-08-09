@@ -51,7 +51,10 @@ pytest 03-agent-safety-guardrails/                  # tests
 4. Log every blocked request (tie into Module 4).
 
 ## Definition of done
-- [ ] Known injection strings are blocked
-- [ ] Output validated against a schema
-- [ ] Only allowlisted tools can run
-- [ ] Blocks are logged, not silently dropped
+- [x] Known injection strings are blocked
+- [x] Output validated against a schema
+- [x] Only allowlisted tools can run
+- [x] Blocks are logged, not silently dropped
+
+> Guards are enforced live in the service (`01-fastapi-deployment/app/guards.py`)
+> and blocked requests return `400` and are logged by the request middleware.

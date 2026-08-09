@@ -8,12 +8,16 @@ optimize blind; always guard quality with Module 2 evals.
 
 ## What's here
 ```
-optimize.py   # tiny benchmark harness: latency percentiles + cost estimate
+optimize.py   # benchmark harness: latency percentiles + cost estimate
+cache.py      # exact-match + naive semantic response cache
+router.py     # small-model-first routing with escalation metric
 ```
 
 ## Run it
 ```bash
 python 07-cost-latency-optimization/optimize.py
+python 07-cost-latency-optimization/cache.py
+python 07-cost-latency-optimization/router.py
 ```
 
 ## Levers (roughly high→low impact)
@@ -52,6 +56,9 @@ Output tokens usually cost 3–5× input — watch verbosity.
 4. Cut the prompt by 30%; confirm eval score is unchanged.
 
 ## Definition of done
-- [ ] Baseline p50/p95 latency + $/request recorded
-- [ ] One optimization applied with before/after numbers
+- [x] Baseline p50/p95 latency + $/request recorded (`optimize.py`)
+- [x] One optimization applied with before/after numbers (`cache.py`, `router.py`)
 - [ ] Eval score unchanged (quality preserved)
+
+> `cache.py` shows exact + semantic response caching; `router.py` shows
+> small-model-first routing with an escalation-rate metric.

@@ -50,6 +50,10 @@ Start deterministic, add judge for open-ended tasks, sample human review.
 4. Add per-category breakdown to the report.
 
 ## Definition of done
-- [ ] One command runs the eval and prints a pass rate
-- [ ] Dataset has ≥10 labeled cases
-- [ ] At least one deterministic + one judge scorer
+- [x] One command runs the eval and prints a pass rate
+- [x] Dataset has ≥10 labeled cases
+- [x] At least one deterministic + one judge scorer
+
+> The eval doubles as a CI gate: it exits non-zero when the pass rate is below
+> `EVAL_THRESHOLD` (default 100%). A JSON-schema scorer (`matches_schema`) and a
+> working `llm_judge` (with an offline fallback) live in `evals/scorers.py`.

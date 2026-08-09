@@ -51,6 +51,9 @@ Prints a nested trace with durations and token/cost attributes.
 4. Add a dashboard panel for p95 latency and $/1k requests.
 
 ## Definition of done
-- [ ] Every request produces one trace with nested spans
-- [ ] Tokens, cost, and latency are attributes on spans
-- [ ] Logs carry a request/correlation ID
+- [x] Every request produces one trace with nested spans
+- [x] Tokens, cost, and latency are attributes on spans
+- [x] Logs carry a request/correlation ID
+
+> The service adds a request-ID + structured-log + latency middleware
+> (`01-fastapi-deployment/app/middleware.py`) and exposes `/metrics`.
