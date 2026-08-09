@@ -39,8 +39,12 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 ## Phase 5 — Ship it (Cloud + Docker + CI/CD)
 - [ ] Containerize with a slim, multi-stage Dockerfile
 - [ ] CI: lint + test + build on every push
+- [ ] Define **dev / stage / prod / on-prem** environments (config, not code)
 - [ ] Deploy to one cloud runtime (Cloud Run / ECS / Container Apps)
+- [ ] Go deep on **Azure** (Container Apps, Key Vault, Entra ID) and **GCP**
+      (Cloud Run, Secret Manager, IAM) — see `05-cloud-aws-gcp-azure/azure` and `/gcp`
 - [ ] Secrets management + config per environment
+- [ ] Promote one image dev → stage → prod
 - [ ] **DoD:** push to `main` → tests run → deploys automatically
 
 ## Phase 6 — Optimize it (Cost & Latency)

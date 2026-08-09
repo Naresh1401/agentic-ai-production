@@ -1,7 +1,14 @@
 # Module 5 — Cloud (AWS / GCP / Azure)
 
 **Goal:** run your containerized agent on a managed cloud runtime, safely
-configured, on all three major clouds (pick one to master first).
+configured, across **dev / stage / prod / on-prem**.
+
+## In this module
+- **[environments/](environments/)** — dev / stage / prod / on-prem strategy,
+  per-environment config, and the promotion flow. **Read this first.**
+- **[azure/](azure/README.md)** — Azure from scratch, in depth.
+- **[gcp/](gcp/README.md)** — Google Cloud from scratch, in depth.
+- This README — the quick, cross-cloud overview below.
 
 ## Pick a runtime
 | Cloud | Easiest agent runtime | Serverless? | Notes |
@@ -58,9 +65,13 @@ az containerapp up \
 2. Store the API key in the cloud secret manager, inject at runtime.
 3. Configure autoscaling (min 0, max N) and load-test it.
 4. Add a budget alert.
+5. Stand up the **same app in dev, stage, and prod** using the configs in
+   [environments/](environments/), promoting one image across all three.
 
 ## Definition of done
 - [ ] Public HTTPS URL serving `/chat`
 - [ ] Secrets injected from a secret manager (not baked in)
 - [ ] Autoscaling configured
 - [ ] A cost budget + alert exists
+- [ ] dev / stage / prod defined with separate secrets + config
+- [ ] On-prem deployment path documented (see [environments/](environments/))

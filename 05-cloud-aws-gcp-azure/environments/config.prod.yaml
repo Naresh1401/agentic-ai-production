@@ -1,0 +1,21 @@
+# Non-secret config for the PROD environment.
+# Real users. Deployed only via CI/CD from main after stage passes.
+# Secrets come from the cloud secret manager, injected at runtime.
+app_env: prod
+log_level: INFO
+
+model:
+  provider: openai
+  name: gpt-4o-mini
+  max_tokens: 1024
+
+scaling:
+  min_instances: 2        # avoid cold starts for real traffic
+  max_instances: 20       # autoscale under load
+  concurrency: 60
+
+observability:
+  trace_sample_rate: 0.2  # sample to control cost at scale
+
+network:
+  public_access: public   # front with a WAF / API gateway

@@ -1,0 +1,24 @@
+# Non-secret config for the ON-PREM environment.
+# Runs inside a private/air-gapped datacenter. No outbound internet assumed.
+# Model is self-hosted; secrets come from Vault or Kubernetes secrets.
+app_env: onprem
+log_level: INFO
+
+model:
+  provider: self_hosted   # vLLM / Ollama / TGI running inside the network
+  name: llama-3.1-8b-instruct
+  endpoint: http://llm.internal.svc.cluster.local:8000/v1
+  max_tokens: 1024
+
+scaling:
+  # Fixed capacity: sized to the on-site cluster, not cloud autoscaling.
+  replicas: 3
+  concurrency: 40
+
+observability:
+  trace_sample_rate: 1.0
+  backend: local          # self-hosted Langfuse/Phoenix/OTEL collector
+
+network:
+  public_access: false    # internal only, no public ingress
+  egress: blocked         # air-gapped; images from a private registry

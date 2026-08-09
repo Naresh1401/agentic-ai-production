@@ -1,0 +1,21 @@
+# Non-secret config for the STAGE environment.
+# Mirrors prod infrastructure at a smaller size. Secrets come from the cloud
+# secret manager (Azure Key Vault / GCP Secret Manager), injected at runtime.
+app_env: stage
+log_level: INFO
+
+model:
+  provider: openai
+  name: gpt-4o-mini
+  max_tokens: 1024
+
+scaling:
+  min_instances: 1
+  max_instances: 3
+  concurrency: 40
+
+observability:
+  trace_sample_rate: 1.0
+
+network:
+  public_access: restricted   # allowlisted IPs / auth required
