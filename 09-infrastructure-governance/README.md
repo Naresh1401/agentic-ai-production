@@ -19,7 +19,12 @@ iac/terraform/          # real Terraform for a governed Cloud Run service
   terraform.tfvars.example
 policy/
   require_labels.rego   # policy-as-code: deny resources missing governance tags
+  require_labels_test.rego  # OPA unit tests for the policy (run in CI)
 ```
+
+> **Enforced in CI:** the `governance` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+> runs `tofu fmt`/`validate` and `opa check`/`opa test` on every push and PR, and
+> blocks the deploy pipeline if either fails.
 
 ## The end-to-end governance flow
 ```mermaid

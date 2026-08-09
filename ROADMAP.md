@@ -66,11 +66,11 @@ A phased plan. Don't rush — each phase builds a real, working capability. Chec
 
 ## Phase 8 — Govern the platform (Infrastructure & Cloud Governance)
 - [ ] Define infrastructure as code (Terraform) per environment
-- [ ] Enforce standard labels/tags (variable validation + policy)
-- [ ] Add policy-as-code checks (OPA/Conftest) in CI
+- [x] Enforce standard labels/tags (variable validation + policy)
+- [x] Add policy-as-code checks (OPA/Conftest) in CI
 - [ ] Least-privilege identity, keyless auth, remote locked state
 - [ ] Budgets/quotas + scheduled drift detection
-- [ ] **DoD:** a non-compliant change is blocked automatically
+- [x] **DoD:** a non-compliant change is blocked automatically
 
 ## ★ Capstone
 - [ ] Combine every module into one deployed, observable, safe, evaluated agent

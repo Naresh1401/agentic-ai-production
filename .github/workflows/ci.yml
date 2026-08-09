@@ -30,6 +30,31 @@ jobs:
       - name: Eval gate
         run: python 02-evaluation-evals/evals/run_eval.py
 
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+
+      - name: Terraform format + validate
+        working-directory: 09-infrastructure-governance/iac/terraform
+        run: |
+          tofu fmt -check -recursive
+          tofu init -backend=false -input=false
+          tofu validate
+
+      - name: Set up OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Policy check + tests
+        run: |
+          opa check 09-infrastructure-governance/policy
+          opa test 09-infrastructure-governance/policy -v
+
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -42,7 +67,7 @@ jobs:
   # Build the image ONCE, push to Artifact Registry, then promote the same
   # image tag through dev -> stage -> prod (GitHub Environments gate each step).
   push-image:
-    needs: build
+    needs: [build, governance]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
