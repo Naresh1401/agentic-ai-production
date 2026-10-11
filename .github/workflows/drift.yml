@@ -24,21 +24,38 @@ jobs:
       run:
         working-directory: 09-infrastructure-governance/iac/terraform
     steps:
+      - name: Check that Google Cloud is connected
+        id: gcp
+        env:
+          PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        run: |
+          if [ -z "$PROVIDER" ]; then
+            echo "::notice::Google Cloud isn't connected yet (GCP_WORKLOAD_IDENTITY_PROVIDER is empty), so drift detection was skipped."
+            echo "connected=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "connected=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gcp.outputs.connected == 'true'
 
       - name: Authenticate to Google Cloud
+        if: steps.gcp.outputs.connected == 'true'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up OpenTofu
+        if: steps.gcp.outputs.connected == 'true'
         uses: opentofu/setup-opentofu@v1
 
       - name: Init with remote state
+        if: steps.gcp.outputs.connected == 'true'
         run: tofu init -backend-config="backends/${{ inputs.environment || 'prod' }}.gcs.hcl"
 
       - name: Plan (detect drift)
+        if: steps.gcp.outputs.connected == 'true'
         run: |
           tofu plan -detailed-exitcode \
             -var-file="environments/${{ inputs.environment || 'prod' }}.tfvars" \
