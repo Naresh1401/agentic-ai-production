@@ -62,7 +62,8 @@ jobs:
   # image tag through dev -> stage -> prod (GitHub Environments gate each step).
   push-image:
     needs: [build, governance]
-    if: github.ref == 'refs/heads/main'
+    # Runs once Artifact Registry is configured (repository variable AR_PROJECT_ID)
+    if: github.ref == 'refs/heads/main' && vars.AR_PROJECT_ID != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,6 +101,10 @@ jobs:
   deploy-dev:
     needs: push-image
     if: github.ref == 'refs/heads/main'
+    # The deploy job signs in to Google Cloud with OIDC, which needs id-token: write
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/deploy-cloudrun.yml
     with:
       environment: dev
@@ -111,6 +116,10 @@ jobs:
 
   deploy-stage:
     needs: [push-image, deploy-dev]
+    # The deploy job signs in to Google Cloud with OIDC, which needs id-token: write
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/deploy-cloudrun.yml
     with:
       environment: stage
@@ -122,6 +131,10 @@ jobs:
 
   deploy-prod:
     needs: [push-image, deploy-stage]
+    # The deploy job signs in to Google Cloud with OIDC, which needs id-token: write
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/deploy-cloudrun.yml
     with:
       environment: prod
